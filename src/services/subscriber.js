@@ -21,6 +21,6 @@ export const createAddress = async (payload, doc) => {
 }
 export const findUserByDocument = async (doc) => {
     const { data } = await api.get(`/subscriber/find/${doc}`, );
-    console.log("AROOOOZ", data.data)
+  
     return data;
 }

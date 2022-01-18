@@ -39,7 +39,7 @@ export default function PaymentCard(props) {
       if (isNaN(number) ) return;
       setCard({ ...card, [prop]: value.toString() }); 
       if(value.length > 4 ) {
-         console.log(creditCardType(value)[0].type)
+         
         if(creditCardType(value)[0]?.type) {
          
           setBrand(creditCardType(value)[0].type)
@@ -84,7 +84,7 @@ if(successSaveCard) submit();
 
   return (
     <Box display="flex" flexDirection="column" marginTop={5} padding="10px">
-      <Typography>Dados do cartão</Typography>
+      <Typography>Ficamos felizes por querer caminhar nesta jornada espiritual e mental conosco. Para continuar basta informar seus dados de pagamento</Typography>
       {existsCard ? 'Já existe um cartão associado a sua conta' : <Box display="flex" flexDirection="column">
         <CustomTextField
           value={card?.number}
@@ -200,7 +200,7 @@ if(successSaveCard) submit();
         <ModalCustom title={msgError?  "Ocorreu um erro" : 'Operação efetuada com sucesso'} message={msgError} open={openModal} deny={{action: () => setMsgError(''), label: 'Fechar'}} setOpen={() => setMsgError('')}/>
         <Button
           className={paymentClass.button}
-          variant="outlined" color="primary" onClick={handleSubmit(onSubmit)}>Avançar</Button>
+          variant="outlined" color="primary" onClick={handleSubmit(onSubmit)}>Confirmar</Button>
       </Box>}
     </Box>
   );

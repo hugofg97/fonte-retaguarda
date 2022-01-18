@@ -62,17 +62,15 @@ export default function PaymentCard(props) {
        <Typography className={paymentClass.subTitle}>{user?.cards?.brand} com final {user?.cards?.last_four_digits} </Typography>
       <Typography className={paymentClass.title}>Nome no cartão:</Typography>
        <Typography className={paymentClass.subTitle}>{user?.cards?.holder_name}</Typography>
-      <Typography className={paymentClass.title}>CPF/CNPJ do cartão:</Typography>
+      <Typography className={paymentClass.title}>CPF do portador do cartão:</Typography>
        <Typography className={paymentClass.subTitle}> {user?.cards?.holder_document} </Typography>
-      <Typography className={paymentClass.title}>Endereço:</Typography>
-       <Typography className={paymentClass.subTitle}>{user?.address?.street} {user?.address?.number},  {user?.address?.neighborhood}, {user?.address?.city}, {user?.address?.state} </Typography>
       </Box>
       <Box display="flex" flexDirection="column" marginTop={5}>
       <Typography className={paymentClass.subTitle}>Para concluir a assinatura, digite sua senha e confirme</Typography>
       <TextField style={{marginTop: 5, marginBottom: 10}} label="senha" type="password" onChange={handleChange} variant="outlined"></TextField>
       <Button label="senha" onClick={onSubmit} variant="outlined">Confirmar</Button>
       </Box>
-      <ModalCustom title="okok" message="oko" open={true}/>
+      <ModalCustom title="okok" message="oko" open={false}/>
 
 
     </Box>

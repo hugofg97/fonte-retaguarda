@@ -1,7 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import PaymentCard from './PaymentCard';
-import Address from './Address';
 import {useParams} from 'react-router-dom';
 import { Box, Container, CircularProgress } from '@material-ui/core';
 import useStyle from './style';
@@ -22,10 +21,8 @@ const StepperPayment = (props) => {
   const renderContentStep = () => {
     switch (step) {
       case 0:
-        return <Address submit={nextStep}></Address>
-      case 1:
         return <PaymentCard submit={nextStep}/>;
-      case 2:
+      case 1:
         return <CheckAndPay />;
       default:
         break;

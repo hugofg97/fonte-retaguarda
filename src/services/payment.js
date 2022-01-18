@@ -7,16 +7,30 @@ const createCard = async ({ address, card, document, idPg }) => {
             ...card,
             label:'renner',
             idPg: idPg,
-            address,
+            address: {
+                city: 'Fonte',
+                state: 'RK',
+                number: '01',
+                neighborhood: 'Paz',
+                street: 'Caminho da felicidade',
+                country: 'BR',
+                zip_code: '04103030'
+            },
             options: {
                 "verify_card": true
             }
 
         });
-        console.log('__________',data.data);
         return data;
  
 }
+
+
+
+
+
+
+
 const signature = async ({ password, document}) => {
     try {
        
