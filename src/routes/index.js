@@ -1,14 +1,36 @@
 import { useRoutes } from 'react-router-dom';
 
 import StepperPayment from '../components/PaymentStepper/Index';
+import AccountConfig from '../components/ConfigAccount.jsx/Index';
+import Login from '../components/Login/Index';
+import PrivateRoute from './CheckAuth';
 
 const Routes = () => {
   const routes = useRoutes([
     {
-      path: '/payment/:id',
+      path: '/payment',
+      element: (
+       <PrivateRoute>
+
+         <StepperPayment />
+       </PrivateRoute>
+        
+      ),
+    },
+    {
+      path: '/configaccount',
+      element: (
+       <PrivateRoute>
+         <AccountConfig />
+       </PrivateRoute>
+        
+      ),
+    },
+    {
+      path: '/login',
       element: (
        
-          <StepperPayment />
+          <Login />
         
       ),
     },

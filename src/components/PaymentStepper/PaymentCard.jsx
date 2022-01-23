@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Typography, TextField, Button, InputAdornment } from '@material-ui/core';
+import { Box, Typography, TextField, Button, InputAdornment, CircularProgress } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { paymentSchema } from '../../schemas/paymentSchema';
@@ -7,9 +7,10 @@ import { withStyles } from '@material-ui/styles';
 import useStyle from './style';
 import InputMask from 'react-input-mask';
 import SubscriberContext from '../../context/Subscriber';
-import { useParams } from 'react-router-dom';
 import creditCardType from 'credit-card-type'
 import ModalCustom from '../ModalCustom';
+import { useNavigate } from 'react-router-dom';
+
 const CustomTextField = withStyles((theme) => ({
   root: {
     '& .MuiFormHelperText-root': {
@@ -25,23 +26,26 @@ const CustomTextField = withStyles((theme) => ({
 }))(TextField);
 
 export default function PaymentCard(props) {
-  const { id } = useParams();
-  const { address, card, setCard, user, msgError, successSaveCard, setMsgError, saveCard } = useContext(SubscriberContext);
+  const history = useNavigate();
+  const {  card, setCard,  getUser, msgError, successSaveCard, setSuccessSaveCard, successSignature, setSuccessSignature, createSignature, setMsgError, saveCard } = useContext(SubscriberContext);
   const paymentClass = useStyle(props);
-  const [ brand, setBrand ] = useState('');
-  const [ openModal, setOpenModal ] = useState(false);
+  const [brand, setBrand] = useState('');
+  const [openModal, setOpenModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+
+ 
   const handleChange = (prop) => (event) => {
     if (prop === "number") {
       const { value } = event.target;
       if (value.length === 0) setCard({ ...card, [prop]: '' });
       const number = parseInt(value);
-      if (isNaN(number) ) return;
-      setCard({ ...card, [prop]: value.toString() }); 
-      if(value.length > 4 ) {
-         
-        if(creditCardType(value)[0]?.type) {
-         
+      if (isNaN(number)) return;
+      setCard({ ...card, [prop]: value.toString() });
+      if (value.length > 4) {
+
+        if (creditCardType(value)[0]?.type) {
+
           setBrand(creditCardType(value)[0].type)
         }
         else setBrand('')
@@ -60,31 +64,53 @@ export default function PaymentCard(props) {
     setCard({ ...card, [prop]: event.target.value });
   };
   const {
+    
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({ mode: 'onBlur', resolver: yupResolver(paymentSchema) });
-  const { submit, existsCard } = props;
+  const {  existsCard } = props;
 
   const onSubmit = async () => {
-    if(!brand) {
-      console.log(brand)
-      console.log('Carttão inválido')
-      return;
+    try {
+
+      setIsLoading(true);
+      if (!brand) {
+        setIsLoading(false);
+        return;
+      }
+      await saveCard({ card: { ...card, brand: brand, holderDocument: card.holderDocument.replace(/[^0-9]/g, '') }})
+    
+    }catch(error) {
+      setIsLoading(false);
     }
-    await saveCard({ card: { ...card, brand: brand, holderDocument: card.holderDocument.replace(/[^0-9]/g, '') }, address: { ...address, zip_code: address.zip_code.replace(/[^0-9]/g, '') }, document: id, idPg: user?.idPg });
+
   }
 
-useEffect(() => {
-if(msgError) setOpenModal(true)
-else setOpenModal(false);
-if(successSaveCard) submit();
-},[msgError, successSaveCard])
+  useEffect(() => {
+    if (msgError) {
+      setOpenModal(true)
+    }
+    else setOpenModal(false);
+    if (successSaveCard) {
+      setSuccessSaveCard(false);
+       createSignature()
+    }
+    if(successSignature) {
+        setSuccessSignature(false);
+        setIsLoading(false);
+        history('/configaccount')
+       
+     } else {
+       setIsLoading(false);
+     };
+    
+  }, [msgError, successSaveCard, successSignature])
 
-
+  
   return (
     <Box display="flex" flexDirection="column" marginTop={5} padding="10px">
-      <Typography>Ficamos felizes por querer caminhar nesta jornada espiritual e mental conosco. Para continuar basta informar seus dados de pagamento</Typography>
+      <Typography>Vimos aqui que você ainda não possui assinatura ativa, se você deseja se tornar assinante e caminhar conosco nesta evolução espiritual, basta seguir com seus dados de pagamento.</Typography>
       {existsCard ? 'Já existe um cartão associado a sua conta' : <Box display="flex" flexDirection="column">
         <CustomTextField
           value={card?.number}
@@ -100,8 +126,8 @@ if(successSaveCard) submit();
           inputProps={{ maxLength: 16 }}
           InputProps={{
             endAdornment: (
-              <InputAdornment style={{border: '0px transparent'}} position="end">
-               {brand}
+              <InputAdornment style={{ border: '0px transparent' }} position="end">
+                {brand}
               </InputAdornment>
             ),
           }}
@@ -197,10 +223,17 @@ if(successSaveCard) submit();
           />
 
         </Box>
-        <ModalCustom title={msgError?  "Ocorreu um erro" : 'Operação efetuada com sucesso'} message={msgError} open={openModal} deny={{action: () => setMsgError(''), label: 'Fechar'}} setOpen={() => setMsgError('')}/>
-        <Button
+          
+        <ModalCustom title={msgError ? "Ocorreu um erro" : 'Operação efetuada com sucesso'} message={msgError} open={openModal} deny={{ action: () => setMsgError(''), label: 'Fechar' }} setOpen={() => setMsgError('')} />
+        
+        {isLoading? <Box>
+
+          <CircularProgress style={{color: 'green'}}></CircularProgress>
+        </Box> :
+          <Button
+          disabled={!isValid}
           className={paymentClass.button}
-          variant="outlined" color="primary" onClick={handleSubmit(onSubmit)}>Confirmar</Button>
+          variant="outlined" color="primary" onClick={handleSubmit(onSubmit)}>Confirmar</Button>}
       </Box>}
     </Box>
   );

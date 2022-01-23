@@ -20,7 +20,12 @@ export const createAddress = async (payload, doc) => {
     return data;
 }
 export const findUserByDocument = async (doc) => {
-    const { data } = await api.get(`/subscriber/find/${doc}`, );
-  
-    return data;
+    console.log(doc)
+    const { data } = await api.get(`/subscriber/find/${doc}`);
+    return data.data;
+}
+export const login = async ({email,password}) => {
+const { data } = await api.post('/subscriber/login', {email,password});
+
+return data.data;
 }
