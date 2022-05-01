@@ -3,21 +3,21 @@ let headers = new Headers();
 
 console.log(headers);
 const http = axios.create({
-  baseURL: "https://mf3vja7363.execute-api.sa-east-1.amazonaws.com/dev/",
+  baseURL: "http://localhost:3000/dev/",
   headers: {
-    'Authorization': 'Basic '+Buffer.from('sk_test_Z58AQoXcghQe91kb:').toString('base64'),
-    'Content-Type': 'application/json', 
-    'Accept':'*/*',
-
+    Authorization:
+      "Basic " + Buffer.from("sk_test_Z58AQoXcghQe91kb:").toString("base64"),
+    "Content-Type": "application/json",
+    Accept: "*/*",
   },
 });
 const logout = (history) => {
   localStorage.clear();
-  window.location = '/login';
+  window.location = "/login";
 };
 http.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("TOKEN");;
+    const token = localStorage.getItem("TOKEN");
     const configInterceptor = { ...config };
     if (token) {
       configInterceptor.headers.Authorization = `Bearer ${token}`;
@@ -26,7 +26,7 @@ http.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 http.interceptors.response.use(
   (response) => {
@@ -35,17 +35,14 @@ http.interceptors.response.use(
   },
   (error) =>
     new Promise((resolve, reject) => {
-    console.log("________________________________");
+      console.log("________________________________");
 
-      console.log(error.response.data.message)
+      console.log(error.response.data.message);
       if (error.response.status === 401 || error.response.status === 403) {
-       
         reject(error);
-          if (error.config.url !== '/login') logout();
-        
+        if (error.config.url !== "/login") logout();
       }
-      reject(error)
-      
-    }),
+      reject(error);
+    })
 );
 export default http;
