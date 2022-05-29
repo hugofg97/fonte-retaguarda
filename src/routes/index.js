@@ -38,7 +38,7 @@ const Routes = () => {
       ),
     },
     {
-      path: '/login',
+      path: '/',
       element: (
        
           <Login />
