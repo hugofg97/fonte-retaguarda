@@ -1,22 +1,8 @@
 import api from "../config/api";
 
-const createCard = async ({ card, document, idPg }) => {
+const createCard = async ({ card }) => {
   const { data } = await api.post(`/subscriber/card`, {
-    ...card,
-    label: "renner",
-    idPg: idPg,
-    address: {
-      city: "Fonte",
-      state: "RK",
-      number: "01",
-      neighborhood: "Paz",
-      street: "Caminho da felicidade",
-      country: "BR",
-      zip_code: "04103030",
-    },
-    options: {
-      verify_card: true,
-    },
+    card
   });
   return data;
 };

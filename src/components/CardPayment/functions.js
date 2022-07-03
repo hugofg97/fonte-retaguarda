@@ -1,20 +1,26 @@
-import creditCardType from 'credit-card-type'
 
-export const handleChange = ({prop, setCard, card, setBrand}) => (event) => {
+export const handleChange =  ({prop, setCard, card, setBrand,getCardBin,setMaskCreditCard}) => async (event) => {
     if (prop === "number") {
-      const { value } = event.target;
+      let { value } = event.target;
+      value = value.replace(/_/g,'' ).replace(/ /g,'' );
       if (value.length === 0) setCard({ ...card, [prop]: '' });
       const number = parseInt(value);
       if (isNaN(number)) return;
       setCard({ ...card, [prop]: value.toString() });
-      if (value.length > 4) {
-
-        if (creditCardType(value)[0]?.type) {
-
-          setBrand(creditCardType(value)[0].type)
+      if (value.replace(/_/g,'' ).replace(/ /g,'' ).length >= 4) {
+          const cardBin = await getCardBin(number);
+          if(cardBin?.gaps) {
+          setBrand(cardBin?.brand);
+          const length =cardBin?.lenghts.pop();
+          let currentMask = ''.padEnd(length, '9');
+          const splitedMask = currentMask.split('');
+          cardBin.gaps?.forEach((v,i) => {
+            splitedMask[v-1] = `${splitedMask[v-1]} `;
+          })
+          const mask = splitedMask.join('');
+          setMaskCreditCard(mask);
+      
         }
-        else setBrand('')
-
       }
       return;
     }

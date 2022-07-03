@@ -64,11 +64,12 @@ export default function AccountConfig(props) {
 
     setIsLoading(false);
   };
-
   return (
     <Box display="flex" marginTop={10} flexDirection="column">
       <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography className={paymentClass.title}> Conecte-se:</Typography>
+        
+        <Typography className={paymentClass.title}> Conecte-se: </Typography>
+    
         <CustomTextField
           value={login?.email}
           error={!!errors.email?.message}

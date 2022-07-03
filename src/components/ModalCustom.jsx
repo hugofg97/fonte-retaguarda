@@ -22,7 +22,7 @@ export default function AlertDialogSlide({
   fullScreen = false
 }) {
   React.useEffect(() => {
-    console.log(open);
+
   }, [open]);
   return (
     <div>

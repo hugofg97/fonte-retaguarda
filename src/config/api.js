@@ -1,19 +1,17 @@
 import axios from "axios";
 let headers = new Headers();
 
-console.log(headers);
 const http = axios.create({
-  baseURL: "http://localhost:3000/dev/",
+  baseURL: process.env.REACT_APP_BASE_URL,
   headers: {
-    Authorization:
-      "Basic " + Buffer.from("sk_test_Z58AQoXcghQe91kb:").toString("base64"),
+    'x-api-key': process.env.REACT_APP_X_API_KEY,
     "Content-Type": "application/json",
     Accept: "*/*",
   },
 });
 const logout = (history) => {
   localStorage.clear();
-  window.location = "/login";
+  window.location = "/";
 };
 http.interceptors.request.use(
   (config) => {
@@ -22,6 +20,7 @@ http.interceptors.request.use(
     if (token) {
       configInterceptor.headers.Authorization = `Bearer ${token}`;
     }
+    configInterceptor.headers['x-api-key'] = process.env.REACT_APP_X_API_KEY
     return { ...configInterceptor };
   },
   (error) => {
@@ -30,17 +29,15 @@ http.interceptors.request.use(
 );
 http.interceptors.response.use(
   (response) => {
-    console.log("________________________________");
     return response;
   },
   (error) =>
     new Promise((resolve, reject) => {
-      console.log("________________________________");
 
-      console.log(error.response.data.message);
+
       if (error.response.status === 401 || error.response.status === 403) {
         reject(error);
-        if (error.config.url !== "/login") logout();
+        if (error.config.url !== "/") logout();
       }
       reject(error);
     })

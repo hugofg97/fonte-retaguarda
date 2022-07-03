@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { withStyles } from "@material-ui/styles";
+
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Typography,
-  TextField,
+
   Button,
   makeStyles,
   CircularProgress,
@@ -12,7 +13,7 @@ import {
 import SubscriberContext from "../../context/Subscriber";
 import { useNavigate, useParams } from "react-router-dom";
 import ModalCustom from "../ModalCustom";
-import { Radio } from "@mui/material";
+import {  Radio } from "@mui/material";
 import PaymentCard from "../CardPayment/Index";
 
 const style = makeStyles(() => ({
@@ -33,7 +34,7 @@ const style = makeStyles(() => ({
 export default function AccountConfig(props) {
   const history = useNavigate();
   const { id } = useParams();
-  const { getSignature, signature, cancelSubscribtion,setSuccessSaveCard, userCards,updateCard,deleteCard,successDeleteCard, setSuccessDeleteCard, successSignature } =
+  const { getSignature, signature, cancelSubscribtion,setSuccessSaveCard,getCardBin, userCards,updateCard,deleteCard,successDeleteCard, setSuccessDeleteCard, successSignature } =
     useContext(SubscriberContext);
   const paymentClass = style(props);
   const [password, setPassword] = useState("");
@@ -84,7 +85,7 @@ export default function AccountConfig(props) {
   useEffect(() => {
     if (successSignature) {
       localStorage.clear();
-      history("/login");
+      history("/");
     }
   }, [successSignature]);
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function AccountConfig(props) {
       getSignature().then(() => setIsLoadingRemoveCard(null));
     }
   }, [successDeleteCard]);
+  
 
   return (
     <Box display="flex" marginTop={10} flexDirection="column">
@@ -155,23 +157,17 @@ export default function AccountConfig(props) {
                   ).toLocaleDateString()}
                 </span>
               </Typography>
-            </Box>
-
             <Typography className={paymentClass.title}>
-              Cartão selecionado:<br></br>
+              Cartão:
               <span className={paymentClass.subTitle}>
-                {signature?.card?.brand.toUpperCase()}
-                {` **** **** **** ${signature?.card?.last_four_digits}`}
+              { signature?.card?.brand && (<img width="35" height="23" src={`https://dashboard.mundipagg.com/emb/images/brands/${signature?.card?.brand}.jpg`} alt=""></img>)}
+       
+               
+                {` Final: ${signature?.card?.last_four_digits}`}
               </span>
               <Button onClick={() => openModalCard()} style={{ color: "blue" }}>Trocar</Button>
             </Typography>
-
-            <Box
-              display="flex"
-              width="100%"
-              flexDirection="row"
-              justifyContent="end"
-            ></Box>
+            </Box>
           </Box>
 
           <Box display="flex" flexDirection="column" marginTop={5}>
@@ -222,10 +218,20 @@ export default function AccountConfig(props) {
           />
           <ModalCustom
             title="Adicionar cartão"
-            component={
-              <PaymentCard backWindow={openModalNewCard}/>
+            component={ userCards.length >=5 ? ( 
+              <Box marginTop={5} display="flex" justifyContent="center">
+                 <Button
+              onClick={openModalNewCard}
+              className={paymentClass.button}
+              variant="outlined"
+              style={{marginTop: 20, textAlign:'center'}}
+              color="primary"
+            >
+              Voltar
+            </Button></Box>):
+              (<PaymentCard backWindow={openModalNewCard}/>)
             }
-            message="Preencha os dados abaixo para adicionar um novo cartão"
+            message={userCards.length >=5 ?'Você já possui 5 cartões cadastrados e exedeu o limite, para cadastrar mias um cartão será preciso remover outro':'Preencha os dados abaixo para adicionar um novo cartão'}
             open={modalNewCard}
             fullScreen={true}
           />
@@ -235,12 +241,12 @@ export default function AccountConfig(props) {
             component={
               <Box margin="auto" marginTop={5} display="flex" flexDirection="column" width="100%"  justifyContent="space-arround">
                 {userCards.map((el) => (
-                  <Box paddingLeft={5} height={50}>
-                  <Radio  onChange={handleSelected} value={el.id} checked={selecetedCard === el.id}></Radio> {el.brand} **** **** **** {el.lastFourDigits} {isLoadingRemoveCard === el.id ? <CircularProgress style={{marginLeft: 10}} size={20} color="secondary"/>:  <Button onClick={() => {
+                  <Box paddingLeft={1} height={50}>
+                  <Radio  onChange={handleSelected} value={el.id} checked={selecetedCard === el.id}></Radio>  { el?.brand && (<img width="35" height="23" src={`https://dashboard.mundipagg.com/emb/images/brands/${el?.brand}.jpg`} alt=""></img>)} Final: {el.lastFourDigits} {isLoadingRemoveCard === el.id ? <CircularProgress style={{marginLeft: 10}} size={20} color="secondary"/>:  <Button onClick={() => {
                     setIsLoadingRemoveCard(el.id);
                     deleteCard(el.id)
                   } 
-                  } style={{color:'red'}}>Remover</Button>}
+                  } style={{color:'red'}}><DeleteIcon  /></Button>}
                   </Box>
                 ))}
                   {!isLoadingSwitchCard? (<Box marginTop={5} display="flex" justifyContent="space-around">

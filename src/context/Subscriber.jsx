@@ -1,4 +1,6 @@
 import React, { createContext, useState } from "react";
+import axios from 'axios';
+import crypto from 'crypto-js'
 import {
   findUserByDocument,
   findSignatureByUserDocument,
@@ -34,6 +36,7 @@ const userData = {
   getSignature: async () => {},
   updateBillingDateSignature: async () => {},
   signature: {},
+  getCardBin: async () => {},
   setSignature: () => {},
   setMsgError: () => {},
   setSuccessSignature: () => {},
@@ -47,7 +50,16 @@ const userData = {
   userCards: [],
   auth: async () => {},
 };
-
+function cipher(data) {
+  const pw = process.env.REACT_APP_CRYPTO_KEY;
+  return crypto.AES.encrypt(JSON.stringify(data), pw).toString();   
+};
+function decipher(data) {
+  const pw = process.env.REACT_APP_CRYPTO_KEY;
+  const bytes  = crypto.AES.decrypt(data,pw);
+  const decryptedData = JSON.parse(bytes.toString(crypto.enc.Utf8));
+  return decryptedData
+  };
 const SubscriberContext = createContext(userData);
 
 export const SubscriberProvider = ({ children }) => {
@@ -74,6 +86,17 @@ export const SubscriberProvider = ({ children }) => {
   const [signature, setSignature] = useState({});
   const [userCards, setUserCards] = useState([]);
 
+  const getCardBin = async (number) => {
+    try {
+      const {data} = await axios.get(`https://api.pagar.me/bin/v1/${number}`, {headers: {
+        "Content-Type": "application/json",
+        "Authorization": 'Basic '+Buffer.from('sk_test_Z58AQoXcghQe91kb:').toString('base64')
+      }});
+      return data;
+    } catch (error) {
+      setMsgError(error.response.data.message);
+    }
+  };
   const getUser = async () => {
     try {
       const data = await findUserByDocument();
@@ -83,7 +106,6 @@ export const SubscriberProvider = ({ children }) => {
       setUser(data);
       return data;
     } catch (error) {
-      console.log(error);
       setMsgError(error.response.data.message);
     }
   };
@@ -92,12 +114,11 @@ export const SubscriberProvider = ({ children }) => {
       const data = await findSignatureByUserDocument(
         localStorage.getItem("DOC")
       );
-      setSignature(data);
+      setSignature(decipher(data));
       const cards = await getUserCardsByCustomer(localStorage.getItem("DOC"));
       setUserCards(cards);
-      return data;
+      return decipher(data);
     } catch (error) {
-      console.log(error);
       // setMsgError(error.response.data.message)
     }
   };
@@ -118,14 +139,31 @@ export const SubscriberProvider = ({ children }) => {
       setMsgError("Login inválido, tente novamente");
     }
   };
-  const saveCard = async ({ card }) => {
+  const saveCard = async ({ card = {number: '', brand: ''} }) => {
     try {
-      setSuccessSaveCard(false);
-      await createCard({
-        card: card,
-        document: localStorage.getItem("DOC"),
+      card.number = card?.number.replace(/ /g, '')
+      card.number = card?.number.replace(/_/g, '')
+      card.brand = card?.brand.split('-')[0]
+      const cardString = {
+        card:card,
+        label: "renner",
         idPg: localStorage.getItem("IDPG"),
-      });
+        address: {
+          city: "Fonte",
+          state: "RK",
+          number: "01",
+          neighborhood: "Paz",
+          street: "Caminho da felicidade",
+          country: "BR",
+          zip_code: "04103030",
+        },
+        options: {
+          verify_card: true,
+        },
+      }
+      const cardCripted = JSON.stringify(cardString);
+      setSuccessSaveCard(false);
+      await createCard({card:cipher(cardCripted)});
       setSuccessSaveCard(true);
       setCard({
         number: "",
@@ -137,7 +175,6 @@ export const SubscriberProvider = ({ children }) => {
         brand: "",
       })
     } catch (error) {
-      console.log("FOI ERRO PORRA");
       setMsgError(
         "Houve um problema com seu cartão, verifique novamente os dados do seu cartão, ou tente um cartão diferente"
       );
@@ -152,7 +189,6 @@ export const SubscriberProvider = ({ children }) => {
       });
       setSuccessSaveCard(true);
     } catch (error) {
-      console.log("FOI ERRO PORRA");
       setMsgError(
         "Houve um problema com seu cartão, verifique novamente os dados do seu cartão, ou tente um cartão diferente"
       );
@@ -164,7 +200,6 @@ export const SubscriberProvider = ({ children }) => {
       await saveSignature({ document: localStorage.getItem("DOC") });
       setSuccessSignature(true);
     } catch (error) {
-      console.log(error.response.data.message);
       setMsgError(
         "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
           error.response.data.message
@@ -177,7 +212,6 @@ export const SubscriberProvider = ({ children }) => {
       await cancelSignature({ document: localStorage.getItem("DOC") });
       setSuccessSignature(true);
     } catch (error) {
-      console.log(error.response.data.message);
       setMsgError(
         "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
           error.response.data.message
@@ -190,7 +224,6 @@ export const SubscriberProvider = ({ children }) => {
       await deleteCardByCustomer(cardId);
       setSuccessDeleteCard(true);
     } catch (error) {
-      console.log(error?.response?.data?.message);
       setMsgError(
         "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
           error?.response?.data?.message
@@ -210,6 +243,7 @@ export const SubscriberProvider = ({ children }) => {
         userId,
         user,
         auth,
+        getCardBin,
         msgError,
         updateCard,
         successSaveCard,

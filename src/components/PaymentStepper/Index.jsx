@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import PaymentCard from "./PaymentCard";
+import PaymentCard from "../../components/CardPayment/Index";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Container, CircularProgress } from "@material-ui/core";
 import useStyle from "./style";
 import SubscriberContext from "../../context/Subscriber";
 
 const StepperPayment = (props) => {
-  const { getUser } = useContext(SubscriberContext);
+  const { getUser, msgError, successSaveCard, setSuccessSaveCard, createSignature, successSignature, setSuccessSignature } = useContext(SubscriberContext);
 
   const history = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -20,6 +20,28 @@ const StepperPayment = (props) => {
   const renderContentStep = () => {
     return <PaymentCard submit={nextStep} />;
   };
+  useEffect(() => {
+  
+    if (successSaveCard) {
+      setSuccessSaveCard(false);
+      createSignature();
+    }
+    if (successSignature) {
+      setSuccessSignature(false);
+    
+      history("/configaccount");
+    } else {
+  
+    }
+  }, [ successSaveCard ]);
+  useEffect(() => {
+  
+    if (successSignature) {
+      setSuccessSignature(false);
+    
+      history("/configaccount");
+    }
+  }, [ successSignature ]);
   useEffect(() => {
     setLoading(true);
     getUser()

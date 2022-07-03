@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
+
 import {
   Box,
-  Typography,
   TextField,
   Button,
   InputAdornment,
@@ -16,7 +16,6 @@ import InputMask from "react-input-mask";
 import SubscriberContext from "../../context/Subscriber";
 import ModalCustom from "../ModalCustom";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { handleChange } from "./functions";
 const CustomTextField = withStyles((theme) => ({
   root: {
@@ -33,6 +32,7 @@ const CustomTextField = withStyles((theme) => ({
 }))(TextField);
 
 export default function PaymentCard(props) {
+
   const history = useNavigate();
   const { backWindow } = props;
   const {
@@ -44,11 +44,13 @@ export default function PaymentCard(props) {
     setSuccessSaveCard,
     setMsgError,
     saveCard,
+    getCardBin,
   } = useContext(SubscriberContext);
   const paymentClass = useStyle(props);
   const [brand, setBrand] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [maskCreditCard, setMaskCreditCard] = useState('9999 9999 9999 9999');
 
   const closeModal = async () => {
     await getSignature();
@@ -65,7 +67,7 @@ export default function PaymentCard(props) {
       brand: "",
     });
     setBrand("");
-    backWindow()
+    if(backWindow) backWindow()
     // history("/configaccount");
   };
 
@@ -94,6 +96,9 @@ export default function PaymentCard(props) {
     }
   };
 
+  const handleMaskCreditCard = () => {
+     return maskCreditCard;  
+  }
   useEffect(() => {
     if (msgError) {
       setOpenModal(true);
@@ -109,32 +114,42 @@ export default function PaymentCard(props) {
   return (
     <Box display="flex" flexDirection="column" marginTop={5} padding="10px">
       <Box display="flex" flexDirection="column">
-        <CustomTextField
+      <InputMask
           value={card?.number}
+          mask={handleMaskCreditCard()}
+          alwaysShowMask={true}
+          maskChar={''}
           error={!!errors.number?.message}
           className={paymentClass.inputs}
           helperText={errors.number?.message}
           {...register(
             "number",
-            handleChange({ prop: "number", setBrand, setCard, card })
+            handleChange({ prop: "number", setBrand, setCard, card, getCardBin, setMaskCreditCard })
           )}
-          onChange={handleChange({ prop: "number", setBrand, setCard, card })}
+          onChange={handleChange({
+            prop: "number",
+            setBrand,
+            setCard,
+            card,
+            getCardBin,
+            setMaskCreditCard
+          })}
           type="text"
-          id="filled-error-helper-text"
+          id="outlined-error-helper-text"
           label="Número do cartão"
-          variant="filled"
-          inputProps={{ maxLength: 16 }}
-          InputProps={{
+          variant="outlined"
+        >
+          {(inputProps) => <CustomTextField {...inputProps}    InputProps={{
             endAdornment: (
               <InputAdornment
                 style={{ border: "0px transparent" }}
                 position="end"
               >
-                {brand}
+             { brand && (<img width="35" height="23" src={`https://dashboard.mundipagg.com/emb/images/brands/${brand}.jpg`} alt=""></img>)}
               </InputAdornment>
             ),
-          }}
-        ></CustomTextField>
+          }}/>}
+        </InputMask>
 
         <CustomTextField
           value={card?.holderName}
@@ -150,6 +165,7 @@ export default function PaymentCard(props) {
             setBrand,
             setCard,
             card,
+          
           })}
           type="text"
           id="outlined-error-helper-text"
@@ -172,6 +188,7 @@ export default function PaymentCard(props) {
             setBrand,
             setCard,
             card,
+          
           })}
           type="text"
           id="outlined-error-helper-text"
@@ -196,6 +213,7 @@ export default function PaymentCard(props) {
               setBrand,
               setCard,
               card,
+            
             })}
             type="text"
             id="outlined-error-helper-text"
@@ -219,6 +237,7 @@ export default function PaymentCard(props) {
               setBrand,
               setCard,
               card,
+            
             })}
             type="text"
             id="outlined-error-helper-text"
