@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import SessionContext from '../../context/Session';
 import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 export default function DeleteSession({videos, id}) {
 
@@ -15,7 +16,7 @@ export default function DeleteSession({videos, id}) {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-
+  const {categoryId} = useParams()
   const handleClickOpen = () => {
     setMsgError("");
     setOpen(true);
@@ -28,7 +29,7 @@ export default function DeleteSession({videos, id}) {
   const deleteThisSession = async () => {
     setIsLoading(true);
     await deleteSession({id});
-    await getSessionsReiki();
+    await getSessionsReiki(categoryId);
     setIsLoading(false);
     handleClose()
   }

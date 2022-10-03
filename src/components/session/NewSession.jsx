@@ -10,9 +10,9 @@ import SessionContext from '../../context/Session';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { newSessionSchema } from '../../schemas/newSessionSchema';
-import { withStyles } from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 export default function NewSession() {
 
@@ -20,7 +20,7 @@ export default function NewSession() {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [session, setSession] = React.useState({});
-
+  const {categoryId} = useParams()
   const handleClickOpen = () => {
     setMsgError("");
     setOpen(true);
@@ -33,7 +33,7 @@ export default function NewSession() {
   const saveSession = async () => {
     setIsLoading(true);
     await createNewSession({session});
-    await getSessionsReiki();
+    await getSessionsReiki(categoryId);
     setIsLoading(false);
     setSession({name: '', description:''});
   }

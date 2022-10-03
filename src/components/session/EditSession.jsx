@@ -13,6 +13,7 @@ import { newSessionSchema } from '../../schemas/newSessionSchema';
 import { withStyles } from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 export default function EditSession({sessionEditable }) {
 
@@ -20,7 +21,7 @@ export default function EditSession({sessionEditable }) {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [session, setSession] = React.useState({});
-
+  const {categoryId} = useParams()
   const handleClickOpen = () => {
     setMsgError("");
     setSession({...sessionEditable})
@@ -34,7 +35,7 @@ export default function EditSession({sessionEditable }) {
   const saveSession = async () => {
     setIsLoading(true);
     await updateSession({session});
-    await getSessionsReiki();
+    await getSessionsReiki(categoryId);
     handleClose()
     setIsLoading(false);
   }
