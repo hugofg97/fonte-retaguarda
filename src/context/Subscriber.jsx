@@ -7,13 +7,7 @@ import {
   login,
   getUserCardsByCustomer,
 } from "../services/subscriber";
-import {
-  deleteCardByCustomer,
-  createCard,
-  updateBillingCard,
-  saveSignature,
-  cancelSignature,
-} from "../services/payment";
+
 
 const userData = {
   setAddress: () => {},
@@ -139,102 +133,13 @@ export const SubscriberProvider = ({ children }) => {
       setMsgError("Login inválido, tente novamente");
     }
   };
-  const saveCard = async ({ card = {number: '', brand: ''} }) => {
-    try {
-      card.number = card?.number.replace(/ /g, '')
-      card.number = card?.number.replace(/_/g, '')
-      card.brand = card?.brand.split('-')[0]
-      const cardString = {
-        card:card,
-        label: "renner",
-        idPg: localStorage.getItem("IDPG"),
-        address: {
-          city: "Fonte",
-          state: "RK",
-          number: "01",
-          neighborhood: "Paz",
-          street: "Caminho da felicidade",
-          country: "BR",
-          zip_code: "04103030",
-        },
-        options: {
-          verify_card: true,
-        },
-      }
-      const cardCripted = JSON.stringify(cardString);
-      setSuccessSaveCard(false);
-      await createCard({card:cipher(cardCripted)});
-      setSuccessSaveCard(true);
-      setCard({
-        number: "",
-        holderName: "",
-        holderDocument: "",
-        expMonth: "",
-        expYear: "",
-        cvv: "",
-        brand: "",
-      })
-    } catch (error) {
-      setMsgError(
-        "Houve um problema com seu cartão, verifique novamente os dados do seu cartão, ou tente um cartão diferente"
-      );
-    }
-  };
-  const updateCard = async (payload) => {
-    try {
-      const { cardId } = payload;
-      setSuccessSaveCard(false);
-      await updateBillingCard({
-        cardId
-      });
-      setSuccessSaveCard(true);
-    } catch (error) {
-      setMsgError(
-        "Houve um problema com seu cartão, verifique novamente os dados do seu cartão, ou tente um cartão diferente"
-      );
-    }
-  };
-  const createSignature = async () => {
-    try {
-      setSuccessSignature(false);
-      await saveSignature({ document: localStorage.getItem("DOC") });
-      setSuccessSignature(true);
-    } catch (error) {
-      setMsgError(
-        "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
-          error.response.data.message
-      );
-    }
-  };
-  const cancelSubscribtion = async () => {
-    try {
-      setSuccessSignature(false);
-      await cancelSignature({ document: localStorage.getItem("DOC") });
-      setSuccessSignature(true);
-    } catch (error) {
-      setMsgError(
-        "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
-          error.response.data.message
-      );
-    }
-  };
-  const deleteCard = async (cardId) => {
-    try {
-      setSuccessDeleteCard(false);
-      await deleteCardByCustomer(cardId);
-      setSuccessDeleteCard(true);
-    } catch (error) {
-      setMsgError(
-        "Houve um problema com sua assinatura, verifique novamente os dados, erro : " +
-          error?.response?.data?.message
-      );
-    }
-  };
+
+
+
 
   return (
     <SubscriberContext.Provider
       value={{
-        deleteCard,
         userCards,
         card,
         cardId,
@@ -245,15 +150,12 @@ export const SubscriberProvider = ({ children }) => {
         auth,
         getCardBin,
         msgError,
-        updateCard,
         successSaveCard,
-        successSignature,
-        createSignature,
+        successSignature,  
         setSuccessSignature,
         setSuccessDeleteCard,
         successDeleteCard,
         setSuccessSaveCard,
-        saveCard,
         setMsgError,
         setUser,
         getUser,
@@ -262,8 +164,7 @@ export const SubscriberProvider = ({ children }) => {
         setUserId,
         getSignature,
         signature,
-        setSignature,
-        cancelSubscribtion,
+        setSignature
       }}
     >
       {children}

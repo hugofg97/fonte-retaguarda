@@ -32,7 +32,7 @@ export const getUserCardsByCustomer = async () => {
   return data.data;
 };
 export const login = async ({ email, password }) => {
-  const { data } = await api.post("/subscriber/login", { email, password });
+  const { data } = await api.post("/auth/login", { email, password });
 
   return data.data;
 };

@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }) => {
   const isLoggedIn = checkAuth();
   const location = useLocation();
 
-  if (!isLoggedIn) {
+  if (isLoggedIn) {
     return <Navigate to="/" state={{ from: location }} />;
   }
 

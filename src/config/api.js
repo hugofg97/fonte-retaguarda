@@ -2,7 +2,7 @@ import axios from "axios";
 let headers = new Headers();
 
 const http = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
+  baseURL: 'http://localhost:8080',
   headers: {
     'x-api-key': process.env.REACT_APP_X_API_KEY,
     "Content-Type": "application/json",

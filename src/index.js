@@ -6,12 +6,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {SubscriberProvider} from './context/Subscriber';
+import { SessionProvider } from './context/Session';
+import { VideoProvider } from './context/Video';
 
 ReactDOM.render(
   <BrowserRouter>
   <React.StrictMode>
     <SubscriberProvider>
-      <App />
+      <SessionProvider>
+        <VideoProvider>
+          <App />
+        </VideoProvider>
+      </SessionProvider>
     </SubscriberProvider>
   </React.StrictMode>
   </BrowserRouter>
