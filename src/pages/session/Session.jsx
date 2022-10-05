@@ -30,7 +30,9 @@ export default function Session() {
     { field: "name", headerName: "Nome", width: 180 },
     { field: "sessionCategoryId", headerName: "Sessão", width: 150 },
     { field: "description", headerName: "Descrição", width: 300 },
-    { field: "active", headerName: "Status", width: 150 },
+    { field: "active", headerName: "Ativo", width: 150, renderCell: (params) => (
+      <span>{params.row.active ? 'Sim': 'Não'}</span>
+    ) },
     {
       field: "Ações",
       headerName: "Ediar",

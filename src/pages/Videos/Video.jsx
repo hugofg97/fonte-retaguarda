@@ -26,9 +26,11 @@ export default function Video(props) {
 
 
   const columns = [
+    { field: "videoThumb", headerName: "Capa", width: 180,  renderCell: (params) => (<img src={params.row.videoThumb} width="80" height="50" alt="img"></img>) },
     { field: "name", headerName: "Nome", width: 180 },
     { field: "description", headerName: "Descrição", width: 300 },
-    { field: "active", headerName: "Status", width: 150 },
+    { field: "active", headerName: "Ativo", width: 150, renderCell: (params) => (<span>{params.row.active? 'Sim': 'Não'}</span>) },
+    { field: "locked", headerName: "Gratuito", width: 150, renderCell: (params) => (<span>{!params.row.locked? 'Sim': 'Não'}</span>) },
     {
       field: "Ações",
       headerName: "Ediar",
@@ -54,6 +56,7 @@ export default function Video(props) {
     >
       <NewVideo></NewVideo>
       <DataGrid
+      
       autoHeight
           rows={pageState.data}
           rowCount={pageState.total}
